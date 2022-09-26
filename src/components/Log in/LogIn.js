@@ -1,22 +1,54 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './LogIn.css'
+import React, { useState } from 'react';
+import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { Link, useNavigate } from 'react-router-dom';
+import auth from '../../firebase.init';
+import './LogIn.css';
 
 const LogIn = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const navigate = useNavigate();
+    const [
+        signInWithEmailAndPassword,
+        user,
+        loading,
+        error,
+    ] = useSignInWithEmailAndPassword(auth);
+
+    const handleEmailBlur = event => {
+        setEmail(event.target.value);
+    }
+
+    const handlePasswordBlur = event => {
+        setPassword(event.target.value);
+    }
+
+    if (user) {
+        navigate("/shop")
+    }
+
+    const handleUserLogIn = event => {
+        event.preventDefault();
+        signInWithEmailAndPassword(email, password);
+    }
+
     return (
         <div className="form-card" >
-            <form>
+            <form onSubmit={handleUserLogIn} >
                 <h2 className="form-title" >Log in</h2>
                 <div className="input-group" >
                     <label htmlFor="email">Email</label>
-                    <input type="email" name="email" required />
+                    <input onBlur={handleEmailBlur} type="email" name="email" required />
                 </div>
                 <div className="input-group" >
                     <label htmlFor="password">Password</label>
-                    <input type="password" name="password" required />
+                    <input onBlur={handlePasswordBlur} type="password" name="password" required />
                 </div>
                 <div>
-                   
+                    <p style={{ color: 'red' }} >{error?.message}</p>
+                    {
+                        loading && <p>Loading...</p>
+                    }
                     <input className="button" type="submit" value="Log in" />
                 </div>
                 <div>
